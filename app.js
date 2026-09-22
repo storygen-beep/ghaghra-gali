@@ -631,8 +631,21 @@
     }
   }
 
+  function askDelete(kind){
+    const foot = document.querySelector('.peek-foot');
+    if (!foot) return;
+    foot.innerHTML = `<span class="confirm-text">Delete this ${kind}? This cannot be undone.</span>
+      <button class="btn solid-danger" data-action="delete-${kind}-now">Yes, delete</button>
+      <button class="btn" data-action="delete-cancel">Keep it</button>`;
+  }
+
+  function cancelDelete(){
+    const d = peek && peek.draft;
+    if (!d) return closePeek();
+    peek.type === 'lehenga' ? openLehenga(d.id) : openBooking(d.id);
+  }
+
   async function deleteBooking(btn){
-    if (btn.dataset.armed !== '1') { btn.dataset.armed = '1'; btn.textContent = 'Click again to delete'; return; }
     if (!requireStore()) return;
     const d = peek.draft;
     btn.disabled = true;
@@ -747,7 +760,6 @@
   }
 
   async function deleteLehenga(btn){
-    if (btn.dataset.armed !== '1') { btn.dataset.armed = '1'; btn.textContent = 'Click again to delete'; return; }
     if (!requireStore()) return;
     const d = peek.draft;
     btn.disabled = true;
@@ -936,9 +948,12 @@
     else if (a === 'new-lehenga') openLehenga(null);
     else if (a === 'close') closePeek();
     else if (a === 'save-booking') saveBooking(t);
-    else if (a === 'delete-booking') deleteBooking(t);
+    else if (a === 'delete-booking') askDelete('booking');
+    else if (a === 'delete-booking-now') deleteBooking(t);
+    else if (a === 'delete-cancel') cancelDelete();
     else if (a === 'save-lehenga') saveLehenga(t);
-    else if (a === 'delete-lehenga') deleteLehenga(t);
+    else if (a === 'delete-lehenga') askDelete('lehenga');
+    else if (a === 'delete-lehenga-now') deleteLehenga(t);
     else if (a === 'tab') { ui.tab = t.dataset.tab; saveUi(); renderBookings(); }
     else if (a === 'grid-prev') shiftWindow(-7);
     else if (a === 'grid-next') shiftWindow(7);
